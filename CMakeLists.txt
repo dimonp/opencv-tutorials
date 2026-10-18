@@ -17,29 +17,12 @@ set(BUILD_CSHARP OFF CACHE INTERNAL "Disable screen_capture_lite C# examples" FO
 set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Enable screen_capture_lite shared libraries" FORCE)
 FetchContent_MakeAvailable(screen_capture_lite)
 
-set(EXECUTABLES
-    "opencv_example" "src/examples/example.cpp"
-    "opencv_utility_classes" "src/examples/utility_classes.cpp"
-    "opencv_draw_primitives" "src/examples/draw_primitives.cpp"
-    "opencv_video_capture" "src/examples/video_capture.cpp"
-    "opencv_video_modify" "src/examples/video_modify.cpp"
-    "opencv_image_area" "src/examples/image_area.cpp"
-    "opencv_image_contour" "src/examples/image_contour.cpp"
-    "opencv_image_transform" "src/examples/image_transform.cpp"
-    "opencv_screen_capture" "src/examples/screen_capture.cpp"
-    "opencv_screen_capture_stream" "src/examples/screen_capture_stream.cpp"
-    "opencv_window_capture_stream" "src/examples/window_capture_stream.cpp"
-    "opencv_accelartion_opencl" "src/examples/accelartion_opencl.cpp"
-    "opencv_dnn_yolo26_onnx_print" "src/examples/dnn_yolo8_onnx_print.cpp"
-    "opencv_dnn_yolo8_onnx" "src/examples/dnn_yolo8_onnx.cpp"
-    "opencv_dnn_yolo26_onnx" "src/examples/dnn_yolo26_onnx.cpp"
-    "opencv_dnn_yolo26_onnx_seg" "src/examples/dnn_yolo26_onnx_seg.cpp"
-)
+file(GLOB SOURCE_FILES "src/examples/*.cpp")
 
-while(EXECUTABLES)
-    list(GET EXECUTABLES 0 TARGET_NAME)
-    list(GET EXECUTABLES 1 SOURCE_FILE)
-    list(REMOVE_AT EXECUTABLES 0 1)
+foreach(SOURCE_FILE ${SOURCE_FILES})
+    get_filename_component(FILE_NAME ${SOURCE_FILE} NAME_WE)
+
+    set(TARGET_NAME "opencv_${FILE_NAME}")
 
     add_executable(${TARGET_NAME} ${SOURCE_FILE})
 
@@ -48,11 +31,11 @@ while(EXECUTABLES)
         ${screen_capture_lite_SOURCE_DIR}/include
     )
 
-    target_link_libraries(${TARGET_NAME} PRIVATE ${OpenCV_LIBS})
     target_link_libraries(${TARGET_NAME} PRIVATE
+        ${OpenCV_LIBS}
         screen_capture_lite_shared
     )
-endwhile()
+endforeach()
 
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/data"
         DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
